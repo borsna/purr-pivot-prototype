@@ -227,3 +227,9 @@ footer .desc {
     content: "";
     line-height: 0;
 }
+
+/***/
+.higlight-result em{
+    font-weight: bold;
+    color:darkgreen;
+}

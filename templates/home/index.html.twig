@@ -40,19 +40,27 @@
 
         Number of hits: {{ result.hits.total }}
 
-        
         {% for publication in result.hits.hits %}
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title"><a href="{{ publication._source.identifier }}">{{ publication._source.title|e }}</a></h5>
-                    <p class="card-text">{{ publication._source.creator|join(', ') }}
-                    <p class="card-text">
-                        {{ (publication._source.description|length > 250 ? publication._source.description|slice(0, 250) ~ '…' : publication._source.description)  }}
-                    </p>
+                    <p class="card-text">{{ publication._source.creator|join(', ') }}</p>
+                
+                    {% if publication.highlight.description is defined %}
+                        <p class="card-text higlight-result">
+                        {% for highlight in publication.highlight.description %}
+                            {{ highlight | raw }}&#8230;<br/>
+                        {% endfor %}
+                        </p>
+                    {% else %}
+                        <p class="card-text">
+                        {{ (publication._source.description|length > 250 ? publication._source.description|slice(0, 250) ~ '…' | raw : publication._source.description | raw)  }}
+                        </p>
+                    {% endif %}
+                    
                     <p class="card-text">
                         {% for subject in publication._source.subject %}
                             <span class="badge badge-pill badge-primary">{{ subject }}</span>
-
                         {% endfor %}
                     </p>
                 </div>
