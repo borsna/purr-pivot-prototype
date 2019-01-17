@@ -1,0 +1,79 @@
+{% extends "base.html.twig" %}
+
+{% block heading %}<h1>Unpublished datasets</h1>{% endblock %}
+
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+        <form id="dataset-form">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(dataset, index) in datasets">
+                        <td v-html="dataset.title"></td>
+                        <td v-html="dataset.status"></td>
+                        <td>
+                            <button type="button" class="btn btn-success" title="Publish" v-on:click.prevent="changeStatus(index, 'published')" v-if="dataset.status == 'submitted'"><i class="fas fa-check-circle"></i></button>
+                            <button type="button" class="btn btn-secondary" title="Undo" v-on:click.prevent="changeStatus(index, 'submitted')" v-if="dataset.status == 'published'"><i class="fas fa-undo"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </form>
+    </div>
+    <div class="col-4">
+        <h4>Unpublished datasets</h4>
+        
+    </div>
+  </div>
+</div>
+
+<script>
+    Vue.component('treeselect', VueTreeselect.Treeselect)
+
+    var datasetForm = new Vue({
+    el: '#dataset-form',
+    data: {
+        datasets: {{ datasets|json_encode|raw }}
+    },
+    methods: {
+        changeStatus: function (index, status) {
+            this.datasets[index].status = status;
+            const self = this;
+            $.ajax({
+                type: "PUT",
+                url: '/dataset/'+this.datasets[index].id,
+                data: JSON.stringify(this.datasets[index]),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(response){
+                    
+                }
+            });
+        }
+    }
+    });
+</script>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@riophae/vue-treeselect@0.0.37/dist/vue-treeselect.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@riophae/vue-treeselect@0.0.37/dist/vue-treeselect.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block debug %}
+    {{ dump(datasets) }}
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends "base.html.twig" %}
+
+{% block heading %}<h1>Register new dataset</h1>{% endblock %}
+
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+        <form id="dataset-form">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" name="title" class="form-control" id="title" placeholder="" v-model="dataset.title">
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea name="description" class="form-control" id="description" rows="4" v-model="dataset.description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="creator">Creator</label>
+                <treeselect :multiple="true" :async="true" :load-options="autocompleteCreator" :options="formState.creator" v-model="dataset.creator">
+                    <div slot="value-label" slot-scope="{ node }" v-html="node.id"></div>
+                    <div slot="option-label" slot-scope="{ node }" v-html="node.label"></div>
+                </treeselect>
+            </div>
+            <div class="form-group">
+                <label for="subject">Tag</label>
+                <treeselect :multiple="true" :async="true" :load-options="autocompleteSubject" v-model="dataset.subject">
+                    <div slot="value-label" slot-scope="{ node }" v-html="node.id"></div>
+                    <div slot="option-label" slot-scope="{ node }" v-html="node.label"></div>
+                </treeselect>
+            </div>
+
+            <div class="form-group">
+                <button type="button" class="btn btn-success" v-on:click.prevent="save">Register</button>
+            </div>
+        </form>
+    </div>
+    <div class="col-4">
+        <h4>Register dataset</h4>
+        Simplified form for regestring dataset
+    </div>
+  </div>
+</div>
+
+<script>
+    Vue.component('treeselect', VueTreeselect.Treeselect)
+
+    var datasetForm = new Vue({
+    el: '#dataset-form',
+    data: {
+        formState:{
+            creator: [
+                {id:'James T. Kirk', label:'James T. Kirk'}
+            ]
+        },
+        dataset: {
+            id: '{{ id }}',
+            identifier: '/dataset/{{ id }}',
+            title:'',
+            description:'',
+            link:'',
+            creator:['James T. Kirk'],
+            subject:[],
+            status:'submitted'
+        }
+    },
+    methods: {
+        save: function () {
+            const self = this;
+            $.ajax({
+                type: "PUT",
+                url: '/dataset/'+this.dataset.id,
+                data: JSON.stringify(this.dataset),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(response){
+                    window.location.href = '/?'+self.dataset.id
+                }
+            });
+        },
+        autocompleteSubject: function({action, searchQuery, callback}){
+            this.autocomplete(searchQuery, 'subject', callback);
+        },
+        autocompleteCreator: function({action, searchQuery, callback}){
+            this.autocomplete(searchQuery, 'creator', callback);
+        },
+        autocomplete: function(searchQuery, type, callback){
+            var self = this;
+            $.ajax({
+                url: '/api/autocomplete/'+type+'/'+searchQuery,
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(response){
+                    const options = response.map(i => ({
+                        id: i,
+                        label: self.highlight(searchQuery, i)
+                    }));
+                    options.push({
+                        id: searchQuery,
+                        label: '<i class="fas fa-plus-square text-success"></i> new: <b>'+searchQuery+'</b>'
+                    })
+                    callback(null, options);
+                }
+            });
+        },
+        highlight: function(substring, string){
+            var reg = new RegExp(substring, 'gi');
+            return string.replace(reg, function(str) {return '<b>'+str+'</b>'});
+        }
+    }
+    });
+</script>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@riophae/vue-treeselect@0.0.37/dist/vue-treeselect.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@riophae/vue-treeselect@0.0.37/dist/vue-treeselect.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+{% endblock %}

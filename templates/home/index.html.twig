@@ -1,0 +1,68 @@
+{% extends "base.html.twig" %}
+
+{% import _self as index %}
+
+{% macro aggregationFilter(aggregation) %}
+    <ul class="list-group">
+        {% for bucket in aggregation.buckets %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ bucket.key }} 
+                <span class="badge badge-primary badge-pill">{{ bucket.doc_count }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% block heading %}<h1>Search</h1>{% endblock %}
+
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-4">
+        <h5>Subject</h5>
+        {{ index.aggregationFilter(result.aggregations.subject) }}
+        
+        <h5>Creator</h5>
+        {{ index.aggregationFilter(result.aggregations.creator) }}
+    </div>
+    <div class="col-8">
+        <form action="." method="get" style="margin-top: 2rem;">
+            <div class="form-row">
+                <div class="form-group col-md-8">
+                    <input name="q" class="form-control mr-sm-2" type="search" placeholder="Search" value="{{ q }}" {{ q ? 'autofocus onfocus="var temp_value=this.value; this.value=\'\'; this.value=temp_value"' : '' }} aria-label="Search">
+                </div>
+                <div class="form-group col-md-4">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </div>
+            </div>
+
+        </form>
+
+        Number of hits: {{ result.hits.total }}
+
+        
+        {% for publication in result.hits.hits %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{{ publication._source.identifier }}">{{ publication._source.title|e }}</a></h5>
+                    <p class="card-text">{{ publication._source.creator|join(', ') }}
+                    <p class="card-text">
+                        {{ (publication._source.description|length > 250 ? publication._source.description|slice(0, 250) ~ '…' : publication._source.description)  }}
+                    </p>
+                    <p class="card-text">
+                        {% for subject in publication._source.subject %}
+                            <span class="badge badge-pill badge-primary">{{ subject }}</span>
+
+                        {% endfor %}
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block debug %}
+    {{ dump(result) }}
+{% endblock %}
