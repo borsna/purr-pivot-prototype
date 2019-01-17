@@ -34,3 +34,4 @@ To harvest a oai-pmh endpoint run:
 - [ ] Date range filter
 - [ ] Clickable filters in sidebar
 - [ ] Landing pages for dataserts registred in the portal
+- [ ] Search result pagination
