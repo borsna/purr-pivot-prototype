@@ -33,6 +33,13 @@ class HarvestCommand extends Command
         $this
             ->setDescription('Harvest OAI-PMH soruce')
             ->addArgument('repository', InputArgument::OPTIONAL, 'Repository to harvest from')
+            ->addOption(
+                'delete-index',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'If set, the search index will be dumped',
+                false
+            );
         ;
     }
 
@@ -40,12 +47,20 @@ class HarvestCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $repository = $input->getArgument('repository');
+        
+        if($input->hasParameterOption('--delete-index')){
+            $io->note('Deleting index');
+            $this->elasticSearchService->deleteIndex();
+        }
 
         $result = [];
 
         if ($repository) {
-            $this->elasticSearchService->createIndex();
-            
+            if($this->elasticSearchService->indexExists() == FALSE){
+                $io->note('Creating index');
+                $this->elasticSearchService->createIndex();
+            }
+
             $io->note(sprintf('Start harvesting from: %s ...', $repository));
 
             $result = $this->oaiPmhService->harvest($repository);
@@ -62,6 +77,6 @@ class HarvestCommand extends Command
             $progressBar->finish();
         }
 
-        $io->success(sprintf('Harvesting done. resources: %s', count($result)));        
+        $io->success(sprintf('Harvesting done. resources: %s', count($result)));
     }
 }

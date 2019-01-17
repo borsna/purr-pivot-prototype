@@ -19,7 +19,7 @@ class OaiPmhService{
                 'title' => (string)$record->xpath('.//dc:title')[0],
                 'id' => '',
                 'set' => $set,
-                'identifier' => (string)$record->xpath('.//dc:identifier')[0],
+                'identifier' => $record->xpath('.//dc:identifier') ? (string)$record->xpath('.//dc:identifier')[0] : (string)$record->xpath('.//oai:identifier')[0],
                 'date' => (string)$record->xpath('.//dc:date')[0],
                 'description' => '',
                 'subject' => [],

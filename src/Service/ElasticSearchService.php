@@ -6,6 +6,7 @@ use Elasticsearch\ClientBuilder;
 class ElasticSearchService{
 
     private $client;
+    private $index = 'publications';
 
     public function __construct()
     {
@@ -17,21 +18,30 @@ class ElasticSearchService{
                             ->build();
     }
 
-    public function createIndex() {
-
-        if($this->client->indices()->exists(['index' => 'publications'])){
-            $this->client->indices()->delete(['index' => 'publications']);
+    public function indexExists(){
+        if($this->client->indices()->exists(['index' => $this->index])){
+            return true;
         }
-        
+
+        return false;
+    }
+
+    public function createIndex() {        
         $this->client->indices()->create([
-            'index' => 'publications',
+            'index' => $this->index,
             'body' => $this->mappings(),
         ]);
     }
 
+    public function deleteIndex(){
+        if($this->indexExists()){
+            $this->client->indices()->delete(['index' => $this->index]);
+        }
+    }
+
     public function index($record){
         $params = [
-            'index' => 'publications',
+            'index' => $this->index,
             'type' => 'publication',
             'id' => $record->id,
             'body' => $record
@@ -42,7 +52,7 @@ class ElasticSearchService{
 
     public function search($query){
         $params = [
-            'index' => 'publications',
+            'index' => $this->index,
             'type' => 'publication',
             'body' => [
                 'query' => $query,
@@ -64,7 +74,7 @@ class ElasticSearchService{
 
     function autocomplete($field, $string){
         $params = [
-            'index' => 'publications',
+            'index' => $this->index,
             'type' => 'publication',
             'body' => [
                 'size' => 0,
