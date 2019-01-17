@@ -10,7 +10,7 @@ class ElasticSearchService{
     public function __construct()
     {
         $hosts = [
-            'localhost:9200',
+            getenv('ELASTICSEARCH_HOST')
         ];
         $this->client = ClientBuilder::create()
                             ->setHosts($hosts)
