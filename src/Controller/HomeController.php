@@ -20,13 +20,23 @@ class HomeController extends AbstractController
       */
     public function index(Request $request)
     {
+        $filters = [
+            'subject' => $request->query->get('subject'),
+            'creator' => $request->query->get('creator'),
+        ];
+
         if($request->query->get('q')){
             $query = [
                 'bool'=>[
                     'should' => [
                         'simple_query_string' => [
                             'query' => $request->query->get('q').' AND status:published',
-                            'fields' => ['title^5', 'description', 'subject^2', 'creator'],
+                            'fields' => [
+                                'title^5', 
+                                'description', 
+                                'subject^2', 
+                                'creator'
+                            ],
                         ]
                     ],
                     'minimum_should_match' => 1,
@@ -45,11 +55,28 @@ class HomeController extends AbstractController
 
         $query['bool']['filter'][] = ['term' => ['status' => 'published']];
 
+        $query['bool']['filter'] = array_merge($query['bool']['filter'], $this->_getFilterQueries($filters));
+
         $result = $this->elasticSearchService->search($query);
 
         return $this->render('home/index.html.twig', [
             'result' => $result,
-            'q' => $request->query->get('q', '')
+            'debug' => $query,
+            'q' => $request->query->get('q', ''),
+            'filters' => $filters
         ]);
+    }
+
+    private function _getFilterQueries($filters){
+        $result = [];
+        foreach($filters as $key => $values){
+            if(is_array($values)){
+                foreach($values as $value){
+                    $result[] = ['term' => [$key.'.raw' => $value]];
+                }
+            }
+        }
+
+        return $result;
     }
 }
