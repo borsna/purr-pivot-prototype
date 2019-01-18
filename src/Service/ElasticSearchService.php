@@ -72,7 +72,7 @@ class ElasticSearchService{
         return $this->client->search($params);
     }
 
-    function autocomplete($field, $string){
+    function autocomplete(string $field, string $string){
         $params = [
             'index' => $this->index,
             'type' => 'publication',

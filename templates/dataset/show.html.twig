@@ -1,0 +1,29 @@
+{% extends "base.html.twig" %}
+
+{% block heading %}<h1>{{ dataset.title }}</h1>{% endblock %}
+
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+        <h2>{{ dataset.title }}</h2>
+        <p>
+            {{ dataset.description }}
+        </p>
+    </div>
+    <div class="col-4">
+        <h4>Sidabar</h4>
+        Sidebar content
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@riophae/vue-treeselect@0.0.37/dist/vue-treeselect.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@riophae/vue-treeselect@0.0.37/dist/vue-treeselect.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+{% endblock %}

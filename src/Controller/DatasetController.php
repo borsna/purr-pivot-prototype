@@ -17,10 +17,12 @@ class DatasetController extends AbstractController
         $this->elasticSearchService = $elasticSearchService;
         $this->metadataDir = __DIR__.'/../../public/metadata/dataset/';
     }
-    
+
     /**
-      * @Route("/dataset/register")
-      */
+     * Mockup page for register dataset and insert it into an index
+     * 
+     * @Route("/register/dataset", methods={"GET"})
+     */
     public function register(Request $request)
     {
         return $this->render('dataset/new.html.twig',[
@@ -29,9 +31,24 @@ class DatasetController extends AbstractController
     }
 
     /**
-	 * @Route("/dataset/{slug}", name="dataset_save", methods={"PUT"})
+	 * Mockup landing page for registred datasets.
+     * 
+     * @Route("/dataset/{slug}", methods={"GET"})
 	 */
-	public function save($slug) {
+	public function show(string $slug) {
+        return $this->render('dataset/show.html.twig',[
+            'dataset' => $this->getFakeMetadata($slug)
+        ]);
+    }
+
+    /**
+	 * Mockup endpoint for storing a registred dataset.
+     * This should be done in a persistant way when done in 
+     * a non-prototype mode.
+     * 
+     * @Route("/dataset/{slug}", methods={"PUT"})
+	 */
+	public function save(string $slug) {
 		$content = file_get_contents('php://input');
 		$json = json_decode($content);
 		self::saveFakeMetadata($slug, $json);
@@ -40,7 +57,10 @@ class DatasetController extends AbstractController
     }
 
     /**
-     * @Route("/dataset/unpublished")
+     * List unpublished datasets and give the user
+     * a way to approve them via a link.
+     * 
+     * @Route("/admin/dataset/unpublished")
      */
     public function listUnpublished(){
 
@@ -67,14 +87,27 @@ class DatasetController extends AbstractController
             'datasets' => $datasets
         ]);
     }
-    
-	private function getFakeMetadata($slug){
+
+    /**
+     * Helper function to get fake metadata from json-file
+     *
+     * @param string $slug
+     * @return object
+     */
+	private function getFakeMetadata(string $slug){
 		$content = file_get_contents($this->metadataDir.$slug.'.json');
 		
 		return json_decode($content);
 	}
 
-	private function saveFakeMetadata($slug, $json){
+    /**
+     * Helper function to store fake metadata
+     *
+     * @param string $slug
+     * @param object $json
+     * @return void
+     */
+	private function saveFakeMetadata(string $slug, $json){
         file_put_contents($this->metadataDir.$slug.'.json', json_encode($json, JSON_PRETTY_PRINT));
         $this->elasticSearchService->index($json);
 	}

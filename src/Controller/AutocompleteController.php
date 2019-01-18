@@ -18,8 +18,10 @@ class AutocompleteController extends AbstractController
     }
     
     /**
-      * @Route("/api/autocomplete/{field}/{string}")
-      */
+     * API endpoint to perform autocomplete on a field in elasticsearch
+     * 
+     * @Route("/api/autocomplete/{field}/{string}")
+     */
     public function autocomplete(Request $request, $field, $string)
     {
         $result = $this->elasticSearchService->autocomplete($field, $string);

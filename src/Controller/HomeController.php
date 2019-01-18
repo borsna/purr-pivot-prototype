@@ -16,8 +16,10 @@ class HomeController extends AbstractController
         $this->elasticSearchService = $elasticSearchService;
     }
     /**
-      * @Route("/")
-      */
+     * Index page route, show list of resources and performs search & filter
+     *  
+     * @Route("/")
+     */
     public function index(Request $request)
     {
         $filters = [
@@ -30,7 +32,7 @@ class HomeController extends AbstractController
                 'bool'=>[
                     'should' => [
                         'simple_query_string' => [
-                            'query' => $request->query->get('q').' AND status:published',
+                            'query' => $request->query->get('q'),
                             'fields' => [
                                 'title^5', 
                                 'description', 
@@ -57,6 +59,7 @@ class HomeController extends AbstractController
 
         $query['bool']['filter'] = array_merge($query['bool']['filter'], $this->_getFilterQueries($filters));
 
+        //Call elasticsearch service
         $result = $this->elasticSearchService->search($query);
 
         return $this->render('home/index.html.twig', [

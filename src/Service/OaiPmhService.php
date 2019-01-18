@@ -3,7 +3,7 @@ namespace App\Service;
 
 class OaiPmhService{
 
-    public function harvest($url, $set = 'publications:dataset') : array{
+    public function harvest(string $url, string $set = 'publications:dataset') : array{
         $client = new \Phpoaipmh\Client($url);
         $endpoint = new \Phpoaipmh\Endpoint($client);
         
