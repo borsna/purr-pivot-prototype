@@ -233,3 +233,7 @@ footer .desc {
     font-weight: bold;
     color:darkgreen;
 }
+
+a.active-filter-link{
+    color:#FFF;
+}

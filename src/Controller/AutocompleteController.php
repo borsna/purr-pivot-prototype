@@ -30,6 +30,5 @@ class AutocompleteController extends AbstractController
         }
 
         return new JsonResponse($list);
-
     }
 }
