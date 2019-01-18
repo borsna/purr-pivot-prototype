@@ -25,7 +25,15 @@ class FilterExtension extends AbstractExtension
         ];
     }
 
-    public function addFilter(string $route, string $key, string $value)
+    /**
+     * Add filter to current request and generate path
+     *
+     * @param string $route The route to link to
+     * @param string $key The filter key (e.g. subject, creator)
+     * @param string $value The value to filter on
+     * @return string relative URL including the new filter
+     */
+    public function addFilter(string $route, string $key, string $value) : string
     {
         $params = $this->requestStack->getCurrentRequest()->query->all();
         
@@ -33,10 +41,18 @@ class FilterExtension extends AbstractExtension
             $params[$key][] = $value;
         }
 
-        return $this->urlGenerator->generate($route, $params, UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->urlGenerator->generate($route, $params);
     }
 
-    public function removeFilter(string $route, string $key, string $value)
+    /**
+     * Remove filter from current request and generate path
+     *
+     * @param string $route The route to link to
+     * @param string $key The filter key (e.g. subject, creator)
+     * @param string $value The value to remove
+     * @return string relative URL including the new filter
+     */
+    public function removeFilter(string $route, string $key, string $value) : string
     {
         $params = $this->requestStack->getCurrentRequest()->query->all();
         
@@ -44,6 +60,6 @@ class FilterExtension extends AbstractExtension
             $params[$key] = array_diff($params[$key], [$value]);
         }
 
-        return $this->urlGenerator->generate($route, $params, UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->urlGenerator->generate($route, $params);
     }
 }
