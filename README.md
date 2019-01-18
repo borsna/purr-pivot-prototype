@@ -32,6 +32,6 @@ To harvest a oai-pmh endpoint run:
 - [x] Autocomplete api for registration form (subject & creator)
 - [ ] Call autocomplete on search form 
 - [ ] Date range filter
-- [ ] Clickable filters in sidebar
+- [x] Clickable filters in sidebar
 - [ ] Landing pages for dataserts registred in the portal
 - [ ] Search result pagination
